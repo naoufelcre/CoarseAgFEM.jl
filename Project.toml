@@ -1,0 +1,21 @@
+name = "CoarseAgFEM"
+uuid = "12345678-abcd-1234-abcd-1234567890ab"
+authors = ["Naoufel Cresson"]
+version = "0.1.0"
+
+[deps]
+Gridap = "56d4f2e9-7ea1-5844-9cf6-b9c51ca7ce8e"
+GridapEmbedded = "8838a6a3-0006-4405-b874-385995508d5d"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+
+[compat]
+Gridap = "0.18"
+GridapEmbedded = "0.9"
+julia = "1.9"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]

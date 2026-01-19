@@ -1,0 +1,5 @@
+output/
+*.vtu
+*.vts
+*.pvd
+.DS_Store
