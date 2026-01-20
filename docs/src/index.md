@@ -1,19 +1,8 @@
 # CoarseAgFEM.jl
 
-Documentation for CoarseAgFEM.jl, a package for robust aggregation finite element methods on Quadtree meshes.
+Coarse meshs for aggregated finite elements methods of GridapEmbedded.jl
 
-## Installation
-
-```julia
-using Pkg
-Pkg.add("CoarseAgFEM")
-```
-
-## Features
-
-- **CoarseAgFEM**: Robust Aggregation for Finite Element Methods.
-- **Quadtree Meshing**: Generate Quadtree meshes from Cartesian grids.
-- **Robust Aggregation**: Handle small cut cells with robust aggregation strategies.
+## API (WIP)
 
 ## API Reference
 
