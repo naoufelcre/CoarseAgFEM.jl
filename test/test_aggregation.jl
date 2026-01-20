@@ -12,7 +12,7 @@ function test_aggregation()
     domain = (0, 1, 0, 1)
     partition = (500, 500) 
     model = CartesianDiscreteModel(domain, partition)
-    qmesh = cartesian_to_quadtree(model)
+    qmesh = initialize_builder(model)
 
     # Circle Level Set (Simpler for aggregation check)
     function level_set_func(x)

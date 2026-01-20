@@ -10,7 +10,7 @@ using Gridap
     @testset "Coarsening" begin
         # Create fine mesh (Level 4: 16x16 = 256 cells)
         model = CartesianDiscreteModel((0, 1, 0, 1), (16, 16))
-        mesh = cartesian_to_quadtree(model)
+        mesh = initialize_builder(model)
         
         # Use Level Set to drive coarsening (Fine at interface, coarse away)
         # Circle at center
@@ -30,7 +30,7 @@ using Gridap
 
     @testset "Balancing" begin
         model = CartesianDiscreteModel((0, 1, 0, 1), (32, 32)) # Finer to allow more ripples
-        mesh = cartesian_to_quadtree(model)
+        mesh = initialize_builder(model)
         
         # Force imbalance: Interface near corner
         dist(x) = (x[1] + x[2]) - 0.4
@@ -45,7 +45,7 @@ using Gridap
     
     @testset "Paving & Gridap Integration" begin
         model = CartesianDiscreteModel((0, 1, 0, 1), (8, 8))
-        mesh = cartesian_to_quadtree(model)
+        mesh = initialize_builder(model)
         # Simple uniform mesh
         elements = pave_mesh(mesh)
         

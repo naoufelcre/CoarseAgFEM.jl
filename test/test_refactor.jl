@@ -18,7 +18,7 @@ function test_refactor()
 
     # 2. Convert to QuadMesh
     # ----------------------
-    qmesh = cartesian_to_quadtree(model)
+    qmesh = initialize_builder(model)
     
     # Check leaves count
     leaves = [n for n in qmesh.all_nodes if n.is_active && isempty(n.children)]

@@ -12,7 +12,7 @@ Coarse meshs for aggregated finite elements methods of GridapEmbedded.jl
 ```@autodocs
 Modules = [
     CoarseAgFEM, 
-    CoarseAgFEM.CartesianToQuadtree, 
+    CoarseAgFEM.MeshCoarsening, 
     CoarseAgFEM.RobustAgFEM, 
     CoarseAgFEM.GridapIntegration,
     CoarseAgFEM.QuadtreeMeshing,
@@ -30,7 +30,7 @@ Modules = [
 - `classify_leaves!`
 - `balance!`
 - `pave_mesh`
-- `cartesian_to_quadtree`
+- `initialize_builder`
 - `quadtree_to_discrete_model`
 - `write_vtk`
 

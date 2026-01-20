@@ -73,7 +73,7 @@ function compare_orphans()
         # Case B: Quadtree 8x
         # ---------------------------------------------------------
         println("  [Case B] Quadtree 8x")
-        qmesh = cartesian_to_quadtree(model_uni)
+        qmesh = initialize_builder(model_uni)
         
         h_min = 0.002
         buffer_margin = 4.0 * h_min
