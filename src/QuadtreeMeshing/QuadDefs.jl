@@ -8,16 +8,16 @@ export is_leaf, get_bounds
 mutable struct QuadNode
     id::Int
     parent::Union{QuadNode, Nothing}
-    children::Vector{QuadNode} 
-    
+    children::Vector{QuadNode}
+
     center::Vector{Float64}
     size::Float64
     level::Int
-    
+
     # helper for fast merging
-    is_active::Bool 
+    is_active::Bool
     status::NodeStatus
-    
+
     QuadNode(id, center, size, level) = new(id, nothing, QuadNode[], center, size, level, true, UNDEFINED)
 end
 
@@ -30,11 +30,10 @@ Used only by `CoarseMeshBuilder`.
 
 export NodeStatus, INTERIOR, EXTERIOR, CUT, BUFFER, UNDEFINED
 
-# Renamed to avoid specific conflict, though Element is generic.
 struct QuadElement
     leaf_id::Int  # Lineage: Which QuadNode created this?
     nodes::Vector{Vector{Float64}}
-    color::String 
+    color::String
 end
 
 """
@@ -42,7 +41,7 @@ end
 
 Transient builder object for constructing a coarse mesh hierarchy.
 Stores the forest of QuadNodes and manages the coarsening/balancing process.
-NOT intended to be used as a permanent mesh structure.
+NOT INTENDED TO BE USED AS A PERMANENT MESH STRUCTURE.
 """
 mutable struct CoarseMeshBuilder
     roots::Vector{QuadNode}     # Support for "Forest" of roots (non-POT domains)

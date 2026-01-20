@@ -58,10 +58,10 @@ function test_crescent()
     println("  Coarsened Leaves: $(length(new_leaves))")
     
     # Debug: Count by status
-    _INTERIOR = CoarseAgFEM.QuadtreeAggregations.QuadDefs.INTERIOR
-    _EXTERIOR = CoarseAgFEM.QuadtreeAggregations.QuadDefs.EXTERIOR
-    _CUT      = CoarseAgFEM.QuadtreeAggregations.QuadDefs.CUT
-    _BUFFER   = CoarseAgFEM.QuadtreeAggregations.QuadDefs.BUFFER
+    _INTERIOR = CoarseAgFEM.INTERIOR
+    _EXTERIOR = CoarseAgFEM.EXTERIOR
+    _CUT      = CoarseAgFEM.CUT
+    _BUFFER   = CoarseAgFEM.BUFFER
     
     c_int = count(n -> n.status == _INTERIOR, new_leaves)
     c_ext = count(n -> n.status == _EXTERIOR, new_leaves)
@@ -80,7 +80,7 @@ function test_crescent()
     active_leaves = [n for n in qmesh.all_nodes if n.is_active && isempty(n.children)]
     elements = QuadElement[]
     for leaf in active_leaves
-        b = CoarseAgFEM.QuadtreeAggregations.get_bounds(leaf)
+        b = get_bounds(leaf)
         # Counter-Clockwise Order: SW, SE, NE, NW
         p1 = [b[1], b[3]]
         p2 = [b[2], b[3]]
@@ -98,7 +98,7 @@ function test_crescent()
     
     # Write VTK (Internal)
     mkpath("output")
-    # CoarseAgFEM.write_vtk("output/crescent_test_mesh.vtu", elements, qmesh)
+    # write_vtk("output/crescent_test_mesh.vtu", elements, qmesh)
     writevtk(out_model, "output/crescent_test_mesh")
     println("  Wrote output/crescent_test_mesh.vtu")
     

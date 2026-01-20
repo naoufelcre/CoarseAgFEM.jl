@@ -16,8 +16,8 @@ using .Paving
 using .Visualization
 
 # Re-export public API
-export CoarseMeshBuilder, QuadNode, QuadElement, get_leaf_at, NodeStatus, INTERIOR, EXTERIOR, CUT, UNDEFINED
-export generate_fine_mesh, generate_fine_to_coarse_map
+export CoarseMeshBuilder, QuadNode, QuadElement, get_leaf_at, get_bounds, NodeStatus, INTERIOR, EXTERIOR, CUT, BUFFER, UNDEFINED
+export generate_fine_to_coarse_map
 export bottom_up_coarsening!, classify_leaves!
 export balance!
 export pave_mesh

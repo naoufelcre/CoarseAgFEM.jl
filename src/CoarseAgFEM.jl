@@ -10,8 +10,8 @@ using GridapEmbedded.CSG
 using GridapEmbedded.Interfaces
 
 # Re-export key types
-export QuadMesh, QuadNode, QuadElement, NodeStatus, INTERIOR, EXTERIOR, CUT, UNDEFINED
-export generate_fine_mesh, bottom_up_coarsening!, classify_leaves!, balance!, pave_mesh, cartesian_to_quadtree
+export CoarseMeshBuilder, QuadNode, QuadElement, NodeStatus, INTERIOR, EXTERIOR, CUT, BUFFER, UNDEFINED
+export generate_fine_mesh, bottom_up_coarsening!, classify_leaves!, balance!, pave_mesh, cartesian_to_quadtree, get_bounds
 export quadtree_to_discrete_model, build_coarse_model
 # export sizing_function... (deprecated)
 export RobustAggregation
@@ -30,6 +30,13 @@ using .CartesianToQuadtree
 using .GridapIntegration
 using .RobustAgFEM
 using .TransferOperators
+
+# Resolve potential namespace conflicts (e.g. CUT with GridapEmbedded)
+const INTERIOR  = QuadtreeMeshing.INTERIOR
+const EXTERIOR  = QuadtreeMeshing.EXTERIOR
+const CUT       = QuadtreeMeshing.CUT
+const BUFFER    = QuadtreeMeshing.BUFFER
+const UNDEFINED = QuadtreeMeshing.UNDEFINED
 
 """
     build_coarse_model(fine_model::CartesianDiscreteModel, level_set_func::Function; parameters...)
