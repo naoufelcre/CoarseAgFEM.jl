@@ -18,6 +18,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/Naoufel/CoarseAgFEM.jl",
+    repo="github.com/Naoufel/CoarseAgFEM.jl.git",
     devbranch="main",
 )
