@@ -3,3 +3,4 @@ output/
 *.vts
 *.pvd
 .DS_Store
+Manifest.toml
