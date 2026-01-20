@@ -60,7 +60,6 @@ jobs:
       - name: Run doctests
         shell: julia --project=docs {0}
         run: |
-        run: |
           using Documenter: DocMeta, doctest
           using CoarseAgFEM
           DocMeta.setdocmeta!(CoarseAgFEM, :DocTestSetup, :(using CoarseAgFEM); recursive=true)
