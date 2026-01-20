@@ -15,14 +15,17 @@ Modules = [
     CoarseAgFEM.CartesianToQuadtree, 
     CoarseAgFEM.RobustAgFEM, 
     CoarseAgFEM.GridapIntegration,
-    CoarseAgFEM.QuadtreeAggregations,
-    CoarseAgFEM.QuadtreeAggregations.Coarsening
+    CoarseAgFEM.QuadtreeMeshing,
+    CoarseAgFEM.QuadtreeMeshing.QuadDefs,
+    CoarseAgFEM.QuadtreeMeshing.Coarsening,
+    CoarseAgFEM.TransferOperators
 ]
 ```
 
 ### Exported Functions
 
 - `generate_fine_mesh`
+- `build_coarse_model`
 - `bottom_up_coarsening!`
 - `classify_leaves!`
 - `balance!`
@@ -33,7 +36,8 @@ Modules = [
 
 ### Types
 
-- `QuadMesh`
+- `CoarseMeshBuilder`
 - `QuadNode`
 - `QuadElement`
+- `TransferOperator`
 - `RobustAggregation`
