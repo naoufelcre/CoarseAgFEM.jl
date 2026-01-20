@@ -1,4 +1,4 @@
-using QuadtreeAgFEM
+using CoarseAgFEM
 using Gridap
 using Gridap.Geometry
 using GridapEmbedded
@@ -84,7 +84,7 @@ function compare_orphans()
         active_leaves = [n for n in qmesh.all_nodes if n.is_active && isempty(n.children)]
         elements = QuadElement[]
         for leaf in active_leaves
-            b = QuadtreeAgFEM.QuadtreeAggregations.get_bounds(leaf)
+            b = CoarseAgFEM.QuadtreeAggregations.get_bounds(leaf)
             p1 = [b[1], b[3]]; p2 = [b[2], b[3]]; p3 = [b[2], b[4]]; p4 = [b[1], b[4]]
             # Gridap QUAD Node Ordering: 1=BL, 2=BR, 3=TL, 4=TR !!
             # We defined p3=TR, p4=TL. So we must push [p1, p2, p4, p3].

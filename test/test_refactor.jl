@@ -1,4 +1,4 @@
-using QuadtreeAgFEM
+using CoarseAgFEM
 using Gridap
 using Gridap.Geometry
 using GridapEmbedded
@@ -50,10 +50,10 @@ function test_refactor()
     # Debug: Count by status
     # Debug: Count by status
     # Access via internal path to ensure availability
-    _INTERIOR = QuadtreeAgFEM.QuadtreeAggregations.QuadDefs.INTERIOR
-    _EXTERIOR = QuadtreeAgFEM.QuadtreeAggregations.QuadDefs.EXTERIOR
-    _CUT      = QuadtreeAgFEM.QuadtreeAggregations.QuadDefs.CUT
-    _BUFFER   = QuadtreeAgFEM.QuadtreeAggregations.QuadDefs.BUFFER
+    _INTERIOR = CoarseAgFEM.QuadtreeAggregations.QuadDefs.INTERIOR
+    _EXTERIOR = CoarseAgFEM.QuadtreeAggregations.QuadDefs.EXTERIOR
+    _CUT      = CoarseAgFEM.QuadtreeAggregations.QuadDefs.CUT
+    _BUFFER   = CoarseAgFEM.QuadtreeAggregations.QuadDefs.BUFFER
     
     c_int = count(n -> n.status == _INTERIOR, new_leaves)
     c_ext = count(n -> n.status == _EXTERIOR, new_leaves)
@@ -72,7 +72,7 @@ function test_refactor()
     active_leaves = [n for n in qmesh.all_nodes if n.is_active && isempty(n.children)]
     elements = QuadElement[]
     for leaf in active_leaves
-        b = QuadtreeAgFEM.QuadtreeAggregations.get_bounds(leaf) # Deep Qualified or use exported
+        b = CoarseAgFEM.QuadtreeAggregations.get_bounds(leaf) # Deep Qualified or use exported
         # Counter-Clockwise Order: SW, SE, NE, NW
         p1 = [b[1], b[3]]
         p2 = [b[2], b[3]]
@@ -99,7 +99,7 @@ function test_refactor()
     
     # Use internal VTK writer which is robust for QuadMesh
     # Signature: write_vtk(filename, elements, mesh)
-    # QuadtreeAgFEM.write_vtk("output/refactor_test_mesh.vtu", elements, qmesh)
+    # CoarseAgFEM.write_vtk("output/refactor_test_mesh.vtu", elements, qmesh)
     println("  Wrote output/gridap_refactor_test_mesh.vtu")
     
     # Basic Assertion: We didn't crash.

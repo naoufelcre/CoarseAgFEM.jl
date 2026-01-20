@@ -21,7 +21,14 @@ Pkg.add("CoarseAgFEM")
 ```
 
 ```@autodocs
-Modules = [CoarseAgFEM]
+Modules = [
+    CoarseAgFEM, 
+    CoarseAgFEM.CartesianToQuadtree, 
+    CoarseAgFEM.RobustAgFEM, 
+    CoarseAgFEM.GridapIntegration,
+    CoarseAgFEM.QuadtreeAggregations,
+    CoarseAgFEM.QuadtreeAggregations.Coarsening
+]
 ```
 
 ### Exported Functions

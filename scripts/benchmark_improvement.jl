@@ -1,4 +1,4 @@
-using QuadtreeAgFEM
+using CoarseAgFEM
 using Gridap
 using Printf
 using LinearAlgebra
