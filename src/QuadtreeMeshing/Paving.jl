@@ -5,7 +5,7 @@ using ..CoreOps
 
 export pave_mesh
 
-function analyze_faces(leaf::QuadNode, root::QuadNode)
+function analyze_faces(leaf::QuadNode, roots::Vector{QuadNode})
     faces = Dict(:N=>false, :E=>false, :S=>false, :W=>false)
     hanging_nodes = []
     
@@ -24,7 +24,7 @@ function analyze_faces(leaf::QuadNode, root::QuadNode)
         p = c .+ probe_offset
         if p[1] < 0 || p[1] > 1 || p[2] < 0 || p[2] > 1 continue end
         
-        neigh = get_leaf_at(root, p)
+        neigh = get_leaf_at(roots, p)
         if neigh.level > leaf.level
             hn = c .+ node_offset
             push!(hanging_nodes, hn)
@@ -34,7 +34,7 @@ function analyze_faces(leaf::QuadNode, root::QuadNode)
     return face_map, length(hanging_nodes)
 end
 
-function get_face_mask(leaf::QuadNode, root::QuadNode)
+function get_face_mask(leaf::QuadNode, roots::Vector{QuadNode})
     mask = 0
     
     h = leaf.size / 2.0
@@ -75,8 +75,8 @@ function get_face_mask(leaf::QuadNode, root::QuadNode)
         
         if !in_bounds1 || !in_bounds2 continue end
         
-        n1 = get_leaf_at(root, p1)
-        n2 = get_leaf_at(root, p2)
+        n1 = get_leaf_at(roots, p1)
+        n2 = get_leaf_at(roots, p2)
         
         # If n1 != n2, it means the neighbor across this face is SPLIT.
         # This implies a hanging node exists at the face midpoint.
@@ -122,7 +122,7 @@ function get_face_mask(leaf::QuadNode, root::QuadNode)
     return mask, hn_dict
 end
 
-function propagate_splits!(mesh::QuadMesh)
+function propagate_splits!(mesh::CoarseMeshBuilder)
     println("  Phase 2b: Propagating Splits (Odd -> Even Hanging Nodes)...")
     
     # 1. Initialize Queue with all active leaves
@@ -153,7 +153,7 @@ function propagate_splits!(mesh::QuadMesh)
         
         if !leaf.is_active || !is_leaf(leaf) continue end
         
-        mask, _ = get_face_mask(leaf, mesh.root)
+        mask, _ = get_face_mask(leaf, mesh.roots)
         n_hanging = count_ones(mask)
         
         # Rule: If Odd (1 or 3), SPLIT.
@@ -175,7 +175,7 @@ function propagate_splits!(mesh::QuadMesh)
             h = leaf.size / 2.0
             dirs = ([0, h*1.1], [0, -h*1.1], [h*1.1, 0], [-h*1.1, 0])
             for d in dirs
-                nb = get_leaf_at(mesh.root, leaf.center .+ d)
+                nb = get_leaf_at(mesh.roots, leaf.center .+ d)
                 if nb.id != leaf.id && nb.is_active && is_leaf(nb)
                     if !(nb.id in q_set)
                         push!(q_vec, nb)
@@ -188,7 +188,7 @@ function propagate_splits!(mesh::QuadMesh)
     println("  -> Propagated $splits additional splits.")
 end
 
-function pave_mesh(mesh::QuadMesh)
+function pave_mesh(mesh::CoarseMeshBuilder)
     # Pre-Process: Eliminate Odd Hanging Nodes
     # propagate_splits!(mesh)
 
@@ -197,7 +197,7 @@ function pave_mesh(mesh::QuadMesh)
     leaves = [n for n in mesh.all_nodes if n.is_active && is_leaf(n)]
     
     for leaf in leaves
-        mask, hn = get_face_mask(leaf, mesh.root)
+        mask, hn = get_face_mask(leaf, mesh.roots)
         
         h = leaf.size / 2.0
         c = leaf.center

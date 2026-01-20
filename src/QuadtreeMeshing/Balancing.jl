@@ -5,7 +5,7 @@ using ..CoreOps
 
 export balance!
 
-function balance!(mesh::QuadMesh)
+function balance!(mesh::CoarseMeshBuilder)
     println("  Phase 2: Balancing (Ripple Strategy)...")
     
     # Queue stores cells that need their neighborhood checked
@@ -57,7 +57,7 @@ function balance!(mesh::QuadMesh)
                 continue
             end
             
-            neighbor = get_leaf_at(mesh.root, p_check)
+            neighbor = get_leaf_at(mesh.roots, p_check)
             
             # Rule: Neighbor cannot be >= 2 levels COARSER than cell.
             # i.e. cell.level - neighbor.level <= 1

@@ -1,0 +1,20 @@
+# Benchmark Regression Log
+# Date: 2026-01-20
+# Task: Refactor QuadMesh -> CoarseMeshBuilder + TransferOperator
+
+## Test Case: Crescent Economy (crescent_economy.jl)
+- Input: 1000x1000 Uniform Grid (Non-POT)
+- Buffer Width: 4*h
+- Max Coarsening Factor: 32
+
+## Baseline (Old API)
+- Total Coarse Cells: 57559
+- Reduction: 94.24%
+
+## Post-Refactor (New API: build_coarse_model)
+- Total Coarse Cells: 57559 (MATCH)
+- Reduction: 94.24%
+- TransferOperator Mapping: 1,000,000 / 1,000,000 fine cells covered (100%).
+
+## Conclusion
+Refactoring successfully effectively sanitized the architecture (Transient Builder vs Permanent Model/Operator) without affecting numerical results.

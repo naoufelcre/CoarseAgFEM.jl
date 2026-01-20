@@ -46,36 +46,28 @@ function crescent_economy_example()
     # ---------------------------
     println("\n--- 2. Adaptive Quadtree Mesh ---")
     
-    # Start with the same fine grid as leaves
-    println("  Initializing Quadtree from Uniform Grid...")
-    qmesh = cartesian_to_quadtree(model_uniform)
-    
-    # A. Classification
-    # Use a small buffer to ensure interface capture
+    # B. Use New API
+    println("  Building coarse model via build_coarse_model API...")
     h_min = 1.0 / n_fine
     buffer_width = 4.0 * h_min
-    println("  Classifying leaves (Buffer: $(buffer_width))...")
-    classify_leaves!(qmesh, level_set_func; buffer_width=buffer_width)
-    
-    # B. Coarsening
-    # Allow coarsening away from interface up to factor 32 (Level 5)
     max_factor = 32
-    println("  Coarsening (Max Factor: $max_factor)...")
-    bottom_up_coarsening!(qmesh; max_coarsening_factor=max_factor)
     
-    # C. Balancing
-    println("  Balancing mesh (2:1 rule)...")
-    balance!(qmesh)
-    
-    # D. Paving
-    println("  Paving elements...")
-    elements = pave_mesh(qmesh)
-    
-    # E. Convert to Gridap
-    model_quadtree, _ = quadtree_to_discrete_model(elements)
+    # Returns (model, transfer_operator)
+    model_quadtree, op = build_coarse_model(model_uniform, level_set_func; 
+                                            max_coarsening_factor=max_factor, 
+                                            buffer_width=buffer_width)
+                                            
     n_cells_quadtree = num_cells(model_quadtree)
-    
     println("  Total Cells: $n_cells_quadtree")
+    
+    # Regression Check
+    expected_cells = 57559
+    if n_cells_quadtree != expected_cells
+        println("  [REGRESSION ERROR] Expected $expected_cells, got $n_cells_quadtree!!")
+        # Don't error out hard so we can see output, but warn loudly
+    else
+        println("  [SUCCESS] Cell count matches baseline ($expected_cells).")
+    end
 
     # 4. Economy Analysis
     # -------------------
@@ -105,14 +97,7 @@ function crescent_economy_example()
         writevtk(model_quadtree, "output/crescent_quadtree")
         println("  -> Written output/crescent_quadtree.vtu")
     catch e
-        println("  [Warning] Failed to write Quadtree VTK (Gridap): $e")
-        println("  -> Attempting fallback internal writer...")
-        try
-            CoarseAgFEM.write_vtk("output/crescent_quadtree_raw.vtu", elements, qmesh)
-            println("  -> Written output/crescent_quadtree_raw.vtu (Fallback)")
-        catch e2
-            println("  [Error] Fallback writer also failed: $e2")
-        end
+        println("  [Warning] Failed to write Quadtree VTK: $e")
     end
 end
 

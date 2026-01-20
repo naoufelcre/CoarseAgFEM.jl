@@ -50,10 +50,10 @@ function test_refactor()
     # Debug: Count by status
     # Debug: Count by status
     # Access via internal path to ensure availability
-    _INTERIOR = CoarseAgFEM.QuadtreeAggregations.QuadDefs.INTERIOR
-    _EXTERIOR = CoarseAgFEM.QuadtreeAggregations.QuadDefs.EXTERIOR
-    _CUT      = CoarseAgFEM.QuadtreeAggregations.QuadDefs.CUT
-    _BUFFER   = CoarseAgFEM.QuadtreeAggregations.QuadDefs.BUFFER
+    _INTERIOR = CoarseAgFEM.QuadtreeMeshing.QuadDefs.INTERIOR
+    _EXTERIOR = CoarseAgFEM.QuadtreeMeshing.QuadDefs.EXTERIOR
+    _CUT      = CoarseAgFEM.QuadtreeMeshing.QuadDefs.CUT
+    _BUFFER   = CoarseAgFEM.QuadtreeMeshing.QuadDefs.BUFFER
     
     c_int = count(n -> n.status == _INTERIOR, new_leaves)
     c_ext = count(n -> n.status == _EXTERIOR, new_leaves)
@@ -72,7 +72,7 @@ function test_refactor()
     active_leaves = [n for n in qmesh.all_nodes if n.is_active && isempty(n.children)]
     elements = QuadElement[]
     for leaf in active_leaves
-        b = CoarseAgFEM.QuadtreeAggregations.get_bounds(leaf) # Deep Qualified or use exported
+        b = CoarseAgFEM.QuadtreeMeshing.get_bounds(leaf) # Deep Qualified or use exported
         # Counter-Clockwise Order: SW, SE, NE, NW
         p1 = [b[1], b[3]]
         p2 = [b[2], b[3]]

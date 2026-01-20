@@ -5,7 +5,7 @@ using ..QuadDefs
 
 export split!, sizing_function_from_distance, logistic_sizing_function, get_leaf_at
 
-function split!(node::QuadNode, mesh::QuadMesh)
+function split!(node::QuadNode, mesh::CoarseMeshBuilder)
     if !is_leaf(node) return end
     
     h = node.size / 4.0
@@ -37,7 +37,34 @@ function logistic_sizing_function(distance_func::Function, min_h::Float64, max_h
     end
 end
 
-function get_leaf_at(root::QuadNode, point)
+# Forest-aware search
+function get_leaf_at(roots::Vector{QuadNode}, point)
+    # 1. Identify which root covers the point
+    # Optimization: If only 1 root, skip loop
+    local root = nothing
+    if length(roots) == 1
+        root = roots[1]
+    else
+        for r in roots
+            b = get_bounds(r)
+            if point[1] >= b[1] && point[1] <= b[2] && point[2] >= b[3] && point[2] <= b[4]
+                root = r
+                break
+            end
+        end
+    end
+    
+    if root === nothing
+        # Point outside domain? Return empty/dummy or error?
+        # For robustness in probing, we usually handle bounds checks before calling this.
+        # But if called, it implies a bug or float error.
+        # Let's return the first root to prevent crash, effectively clamping?
+        # Or better: return a sentinel.
+        # Existing logic returned `curr` (the leaf or parent where it stopped).
+        # Let's return the closest root?
+        return roots[1] 
+    end
+
     curr = root
     # Traverse only active nodes logic from original code
     while !is_leaf(curr)
@@ -55,5 +82,8 @@ function get_leaf_at(root::QuadNode, point)
     end
     return curr
 end
+
+# Legacy overload for single root calls (if any remain transiently)
+get_leaf_at(root::QuadNode, point) = get_leaf_at([root], point)
 
 end # module

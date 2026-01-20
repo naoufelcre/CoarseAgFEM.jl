@@ -13,12 +13,12 @@ function generate_fine_mesh(L, max_level)
 end
 
 """
-    classify_leaves!(mesh::QuadMesh, level_set_func::Function; buffer_width::Float64=0.0)
+    classify_leaves!(mesh::CoarseMeshBuilder, level_set_func::Function; buffer_width::Float64=0.0)
 
 Classifies all active leaves as INTERIOR, EXTERIOR, CUT, or BUFFER.
 BUFFER status is assigned if the cell is not CUT coverage, but is within `buffer_width` of the interface.
 """
-function classify_leaves!(mesh::QuadMesh, level_set_func::Function; buffer_width::Float64=0.0)
+function classify_leaves!(mesh::CoarseMeshBuilder, level_set_func::Function; buffer_width::Float64=0.0)
     println("  Phase 0: Classifying Leaves (Buffer Width=$buffer_width)...")
     count_int = 0
     count_ext = 0
@@ -64,13 +64,13 @@ function classify_leaves!(mesh::QuadMesh, level_set_func::Function; buffer_width
 end
 
 """
-    bottom_up_coarsening!(mesh::QuadMesh; max_coarsening_factor::Int=8)
+    bottom_up_coarsening!(mesh::CoarseMeshBuilder; max_coarsening_factor::Int=8)
 
 Greedy packing: Merges 4 siblings if they are HOMOGENEOUS (all Interior or all Exterior).
 Cut cells and Mixed cells are never merged.
 Coarsening stops if the parent cell size would exceed `max_coarsening_factor * h_min` (e.g. 8*h).
 """
-function bottom_up_coarsening!(mesh::QuadMesh; max_coarsening_factor::Int=8)
+function bottom_up_coarsening!(mesh::CoarseMeshBuilder; max_coarsening_factor::Int=8)
     println("  Phase 1: Bottom-Up Homogeneity Coarsening (Max Factor = $max_coarsening_factor)...")
     
     # Determine max level (finest)
@@ -167,7 +167,7 @@ function bottom_up_coarsening!(mesh::QuadMesh; max_coarsening_factor::Int=8)
 end
 
 """
-    generate_fine_to_coarse_map(mesh::QuadMesh, max_level::Int)
+    generate_fine_to_coarse_map(mesh::CoarseMeshBuilder, max_level::Int)
 
 Generates a mapping between the uniform fine grid (at `max_level`) and the current
 coarse QuadMesh.
@@ -178,46 +178,79 @@ Returns:
     
 This serves as a mapping operator M: Ω_h -> Ω_H.
 """
-function generate_fine_to_coarse_map(mesh::QuadMesh, max_level::Int)
-    println("  Phase 2: Generating Fine-to-Coarse Mapping (Max Level = $max_level)...")
-    
-    # Grid dimensions
+# Legacy/Convenience: If only max_level is provided, assume POT
+function generate_fine_to_coarse_map(mesh::CoarseMeshBuilder, max_level::Int)
     N = 2^max_level
-    h_fine = 1.0 / N
+    return generate_fine_to_coarse_map(mesh, (N, N))
+end
+
+"""
+    generate_fine_to_coarse_map(mesh::CoarseMeshBuilder, partition::Tuple{Int, Int})
+
+Generates a mapping between the uniform fine grid (defined by `partition`) and the current
+coarse CoarseMeshBuilder.
+"""
+function generate_fine_to_coarse_map(mesh::CoarseMeshBuilder, partition::Tuple{Int, Int})
+    nx, ny = partition
+    println("  Phase 2: Generating Fine-to-Coarse Mapping (Grid: $nx x $ny)...")
     
-    # Resulting map: indices are [x_index, y_index]
-    # each entry is the leaf ID
-    fine_map = zeros(Int, N, N)
+    # We assume domain is (0, Lx) x (0, Ly) ??
+    # Actually, CoarseMeshBuilder doesn't store explicit global Domain Bounds easily accessible?
+    # Leaf 1 center and size gives us info. 
+    # But usually Quadtree assumes relative coords or handled during construction.
+    # CartesianToQuadtree uses `desc.origin` and `desc.sizes`.
     
-    # Get all active leaves
-    leaves = [n for n in mesh.all_nodes if n.is_active && is_leaf(n)]
+    # We need to know hx, hy.
+    # We assume 'mesh' covers the same domain as the partition.
+    # But we don't have the domain size here! 
+    # `QuadNode` has `center` and `size`. 
+    # Bounding box of all nodes?
     
-    # Iterate through leaves and fill the map regions they cover
+    # Let's compute global bounds from roots
+    # Assumes roots cover the domain.
+    # Or just iterate all leaves and compute BB.
+    
+    xmin = Inf; xmax = -Inf; ymin = Inf; ymax = -Inf
+    active_leaves = [n for n in mesh.all_nodes if n.is_active && is_leaf(n)]
+    
+    for leaf in active_leaves
+        b = get_bounds(leaf)
+        xmin = min(xmin, b[1])
+        xmax = max(xmax, b[2])
+        ymin = min(ymin, b[3])
+        ymax = max(ymax, b[4])
+    end
+    
+    Lx = xmax - xmin
+    Ly = ymax - ymin
+    
+    hx = Lx / nx
+    hy = Ly / ny
+    
+    # Resulting map
+    fine_map = zeros(Int, nx, ny)
+    
     count_filled = 0
+    eps = 1e-10 * min(hx, hy)
     
-    for leaf in leaves
-        b = get_bounds(leaf) # (xmin, xmax, ymin, ymax)
+    for leaf in active_leaves
+        b = get_bounds(leaf)
         
-        # Calculate index ranges in the fine grid (1-based)
-        # We use a small epsilon to handle floating point boundary robustness
-        eps = 1e-10
+        # Calculate index ranges relative to (xmin, ymin)
+        # 1-based indices
         
-        # x-indices
-        ix_start = floor(Int, b[1] / h_fine + eps) + 1
-        ix_end   = floor(Int, b[2] / h_fine - eps) + 1
+        ix_start = floor(Int, (b[1] - xmin) / hx + eps) + 1
+        ix_end   = floor(Int, (b[2] - xmin) / hx - eps) + 1
         
-        # y-indices
-        iy_start = floor(Int, b[3] / h_fine + eps) + 1
-        iy_end   = floor(Int, b[4] / h_fine - eps) + 1
+        iy_start = floor(Int, (b[3] - ymin) / hy + eps) + 1
+        iy_end   = floor(Int, (b[4] - ymin) / hy - eps) + 1
         
-        # Clamp to grid bounds (safety against float errors)
-        ix_start = clamp(ix_start, 1, N)
-        ix_end   = clamp(ix_end,   1, N)
-        iy_start = clamp(iy_start, 1, N)
-        iy_end   = clamp(iy_end,   1, N)
+        # Clamp
+        ix_start = clamp(ix_start, 1, nx)
+        ix_end   = clamp(ix_end,   1, nx)
+        iy_start = clamp(iy_start, 1, ny)
+        iy_end   = clamp(iy_end,   1, ny)
         
-        # Fill the block
-        # Optimization: for large leaves, this fills a large block.
         for y in iy_start:iy_end
             for x in ix_start:ix_end
                 fine_map[x, y] = leaf.id
@@ -226,8 +259,8 @@ function generate_fine_to_coarse_map(mesh::QuadMesh, max_level::Int)
         end
     end
     
-    coverage_pct = (count_filled / (N*N)) * 100
-    println("    -> Mapping generated. Covered $(count_filled)/$(N*N) fine cells ($(Printf.@sprintf("%.2f", coverage_pct))%).")
+    coverage_pct = (count_filled / (nx*ny)) * 100
+    println("    -> Mapping generated. Covered $(count_filled)/$(nx*ny) fine cells ($(Printf.@sprintf("%.2f", coverage_pct))%).")
     
     return fine_map
 end

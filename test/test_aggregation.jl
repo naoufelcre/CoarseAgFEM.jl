@@ -31,7 +31,7 @@ function test_aggregation()
     active_leaves = [n for n in qmesh.all_nodes if n.is_active && isempty(n.children)]
     elements = QuadElement[]
     for leaf in active_leaves
-        b = CoarseAgFEM.QuadtreeAggregations.get_bounds(leaf)
+        b = CoarseAgFEM.QuadtreeMeshing.get_bounds(leaf)
         p1 = [b[1], b[3]]; p2 = [b[2], b[3]]; p3 = [b[2], b[4]]; p4 = [b[1], b[4]]
         push!(elements, QuadElement(leaf.id, [p1, p2, p3, p4], "orange"))
     end

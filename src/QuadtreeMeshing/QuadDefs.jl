@@ -1,6 +1,6 @@
 module QuadDefs
 
-export QuadNode, QuadMesh, QuadElement
+export QuadNode, CoarseMeshBuilder, QuadElement
 export is_leaf, get_bounds
 
 @enum NodeStatus INTERIOR EXTERIOR CUT BUFFER UNDEFINED
@@ -21,6 +21,13 @@ mutable struct QuadNode
     QuadNode(id, center, size, level) = new(id, nothing, QuadNode[], center, size, level, true, UNDEFINED)
 end
 
+"""
+    QuadNode (Builder Node)
+
+Represents a node in the construction tree/forest.
+Used only by `CoarseMeshBuilder`.
+"""
+
 export NodeStatus, INTERIOR, EXTERIOR, CUT, BUFFER, UNDEFINED
 
 # Renamed to avoid specific conflict, though Element is generic.
@@ -30,8 +37,15 @@ struct QuadElement
     color::String 
 end
 
-mutable struct QuadMesh
-    root::QuadNode
+"""
+    mutable struct CoarseMeshBuilder
+
+Transient builder object for constructing a coarse mesh hierarchy.
+Stores the forest of QuadNodes and manages the coarsening/balancing process.
+NOT intended to be used as a permanent mesh structure.
+"""
+mutable struct CoarseMeshBuilder
+    roots::Vector{QuadNode}     # Support for "Forest" of roots (non-POT domains)
     all_nodes::Vector{QuadNode} # Flat list of ALL nodes created (including deleted ones)
 end
 

@@ -4,14 +4,14 @@ using Gridap
 using Gridap.Arrays
 using Gridap.ReferenceFEs
 using Gridap.Geometry
-using ..QuadtreeAggregations
+using ..QuadtreeMeshing
 
 export quadtree_to_discrete_model
 
 """
     quadtree_to_discrete_model(elements::Vector{QuadElement})
 
-Converts a list of `QuadElement` (from QuadtreeAggregations) into a `Gridap.UnstructuredDiscreteModel`.
+Converts a list of `QuadElement` (from QuadtreeMeshing) into a `Gridap.UnstructuredDiscreteModel`.
 Handles mixed meshes (Triangles and Quadrilaterals).
 """
 function quadtree_to_discrete_model(elements::Vector{QuadElement})

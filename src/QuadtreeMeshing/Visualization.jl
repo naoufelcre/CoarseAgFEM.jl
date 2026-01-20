@@ -22,7 +22,7 @@ end
 # ------------------------------------------------------------------------------
 # Minimal Legacy VTK Writer (Zero Dependency)
 # ------------------------------------------------------------------------------
-function write_vtk(filename, elements::Vector{QuadElement}, mesh::Union{QuadMesh, Nothing}=nothing)
+function write_vtk(filename::String, elements::Vector{QuadElement}, mesh::Union{CoarseMeshBuilder, Nothing}=nothing)
     # Gather unique nodes
     unique_nodes = Vector{Float64}[]
     node_map = Dict{Vector{Float64}, Int}()
