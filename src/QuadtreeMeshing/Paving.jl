@@ -186,7 +186,8 @@ function pave_mesh(mesh::CoarseMeshBuilder)
 
     println("  Phase 3: Template Paving (All-Quad Patterns)...")
     elements = QuadElement[]
-    leaves = [n for n in mesh.all_nodes if n.is_active && is_leaf(n)]
+    # Only pave leaves that are not EXTERIOR or UNDEFINED
+    leaves = [n for n in mesh.all_nodes if n.is_active && is_leaf(n) && n.status != EXTERIOR && n.status != UNDEFINED]
 
     for leaf in leaves
         mask, hn = get_face_mask(leaf, mesh.roots)

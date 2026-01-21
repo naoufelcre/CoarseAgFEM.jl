@@ -3,16 +3,61 @@ module Visualization
 using ..QuadDefs
 using Printf
 
+using Gridap
+using Gridap.Geometry
+using Gridap.ReferenceFEs
+
 export write_svg, write_vtk
 
-function write_svg(filename, all_elements, root_size=1.0)
+"""
+    write_svg(model::DiscreteModel, filename::String)
+
+Write a DiscreteModel to SVG format. API matches Gridap's `writevtk(model, filename)`.
+"""
+function write_svg(model::DiscreteModel, filename::String)
+    # Extract cell coordinates from the model
+    topo = get_grid_topology(model)
+    coords = get_node_coordinates(model)
+    cell_node_ids = get_cell_node_ids(Triangulation(model))
+    
+    open(filename * ".svg", "w") do io
+        # Compute bounds
+        xs = [c[1] for c in coords]
+        ys = [c[2] for c in coords]
+        xmin, xmax = minimum(xs), maximum(xs)
+        ymin, ymax = minimum(ys), maximum(ys)
+        
+        width = xmax - xmin
+        height = ymax - ymin
+        scale = 1000.0 / max(width, height)
+        
+        write(io, "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 $(width*scale) $(height*scale)' style='background-color:white'>\n")
+        write(io, "<style>polygon { fill: white; stroke: black; stroke-width: 0.5; vector-effect: non-scaling-stroke; }</style>\n")
+        
+        for cell_ids in cell_node_ids
+            pts = [coords[id] for id in cell_ids]
+            pts_str = join(["$((p[1]-xmin)*scale), $((ymax-p[2])*scale)" for p in pts], " ")
+            write(io, "<polygon points='$pts_str' />\n")
+        end
+        
+        write(io, "</svg>")
+    end
+    println("  Saved SVG to $(filename).svg")
+end
+
+"""
+    write_svg(filename::String, elements::Vector{QuadElement}, root_size=1.0)
+
+Write QuadElements to SVG format. Legacy API for internal mesh visualization.
+"""
+function write_svg(filename::String, elements, root_size=1.0)
     open(filename, "w") do io
         scale = 1000.0
         write(io, "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 $(root_size*scale) $(root_size*scale)' style='background-color:white'>\n")
-        write(io, "<style>polygon { stroke: black; stroke-width: $(0.5/scale); vector-effect: non-scaling-stroke; }</style>\n")
-        for el in all_elements
+        write(io, "<style>polygon { fill: white; stroke: black; stroke-width: 0.5; vector-effect: non-scaling-stroke; }</style>\n")
+        for el in elements
             pts_str = join(["$(p[1]*scale), $((root_size - p[2])*scale)" for p in el.nodes], " ") 
-            write(io, "<polygon points='$pts_str' fill='$(el.color)' opacity='0.8' />\n")
+            write(io, "<polygon points='$pts_str' />\n")
         end
         write(io, "</svg>")
     end

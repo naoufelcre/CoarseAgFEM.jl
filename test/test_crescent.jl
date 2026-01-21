@@ -96,11 +96,10 @@ function test_crescent()
     out_model, lineage = quadtree_to_discrete_model(elements)
     println("  Output Model: $(num_cells(out_model)) cells.")
     
-    # Write VTK (Internal)
+    # Write SVG (Internal) - Gridap-style API
     mkpath("output")
-    # write_vtk("output/crescent_test_mesh.vtu", elements, qmesh)
-    writevtk(out_model, "output/crescent_test_mesh")
-    println("  Wrote output/crescent_test_mesh.vtu")
+    write_svg(out_model, "output/crescent_test_mesh")
+    println("  Wrote output/crescent_test_mesh.svg")
     
     @test num_cells(out_model) > 0
 end

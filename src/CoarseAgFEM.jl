@@ -15,12 +15,11 @@ export generate_fine_mesh, bottom_up_coarsening!, classify_leaves!, balance!, pa
 export quadtree_to_discrete_model, build_coarse_model
 # export sizing_function... (deprecated)
 export RobustAggregation
-export write_vtk
-export TransferOperator
+export write_vtk, write_svg
+export QuadtreeTransfer
 
 include("QuadtreeMeshing/QuadtreeMeshing.jl")
 include("GridapIntegration.jl")
-include("TransferOperator.jl")
 include("MeshCoarsening.jl")
 include("RobustAgFEM.jl")
 
@@ -29,7 +28,6 @@ using .QuadtreeMeshing
 using .MeshCoarsening
 using .GridapIntegration
 using .RobustAgFEM
-using .TransferOperators
 
 # Resolve potential namespace conflicts (e.g. CUT with GridapEmbedded)
 const INTERIOR  = QuadtreeMeshing.INTERIOR
