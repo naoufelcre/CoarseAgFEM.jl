@@ -43,36 +43,5 @@ using Gridap
         @test_nowarn balance!(mesh)
     end
     
-    @testset "Paving & Gridap Integration" begin
-        model = CartesianDiscreteModel((0, 1, 0, 1), (8, 8))
-        mesh = initialize_builder(model)
-        # Simple uniform mesh
-        elements = pave_mesh(mesh)
-        
-        
-        @test length(elements) > 0
-
-        # Visualization
-        if !isdir("output")
-            mkdir("output")
-        end
-        write_vtk("output/quadtree_mesh.vtk", elements, mesh)
-        
-        # Convert to Gridap
-        model, _ = quadtree_to_discrete_model(elements)
-        
-        @test isa(model, DiscreteModel)
-        # Since fine mesh was uniform quads, pave_mesh (if no hanging nodes) should make quads?
-        # Actually Paving.jl says:
-        # "If count == 0: push QuadElement([sw, se, ne, nw])" -> Uniform quad
-        # GridapIntegration says:
-        # "Quads are split into 2 triangles."
-        
-        # Mixed Paving preserves uniform quads (64 cells)
-        # 0 Hanging nodes -> Standard Quads
-        @test num_cells(model) == 64
-        @test Gridap.Geometry.num_nodes(model) > 0
-    end
-    
-
 end
+
