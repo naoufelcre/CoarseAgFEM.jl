@@ -1,5 +1,5 @@
 name = "CoarseAgFEM"
-uuid = "12345678-abcd-1234-abcd-1234567890ab"
+uuid = "bae49019-d25a-4cb4-ab19-4af989388f1a"
 authors = ["Naoufel Cresson"]
 version = "0.1.0"
 
@@ -11,7 +11,7 @@ Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 TransferOperator = "d7cbbda6-fde5-4b94-961a-baab5090bb7e"
 
 [compat]
-Gridap = "0.18"
+Gridap = "=0.18.0"
 GridapEmbedded = "0.9"
 julia = "1.9"
 
